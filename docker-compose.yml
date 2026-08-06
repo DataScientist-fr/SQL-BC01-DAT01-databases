@@ -40,7 +40,9 @@ services:
     restart: unless-stopped
     profiles: ["ui"]
     ports:
-      - "8080:8080"
+      # 8081 côté hôte : le 8080 est souvent déjà pris par un serveur de dev
+      # (uvicorn / runserver), même raison que le 5433 ci-dessus.
+      - "8081:8080"
     environment:
       ADMINER_DEFAULT_SERVER: db
       ADMINER_DESIGN: dracula

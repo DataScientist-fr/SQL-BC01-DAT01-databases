@@ -6,12 +6,13 @@ Données extraites de la base de test réelle de la plateforme : **6 patients, 3
 > ⚠️ Les exercices de la plateforme tournent en **SQLite**, pas en PostgreSQL. Les solutions du module M1
 > donnent ici le même résultat — **sauf l'ordre des NULL au tri**, qui est inversé. Voir plus bas.
 
-## Les quatre commandes
+## Les commandes
 
 ```bash
 make up      # démarrer la base (charge les données au tout premier démarrage)
 make load    # (re)charger data/careaccess.sql — idempotent, DROP puis CREATE
 make psql    # console psql interactive
+make ui      # interface web Adminer → http://localhost:8081
 make down    # arrêter (le volume est conservé)
 ```
 
@@ -32,7 +33,21 @@ une base à moitié remplie. Dans ce cas : `make load`.
 | Base · utilisateur · mot de passe | `careaccess` (les trois) |
 
 Le port **5433** est délibéré : il évite le conflit avec un PostgreSQL local déjà sur 5432.
-Interface web optionnelle (Adminer) : `docker compose --profile ui up -d` → http://localhost:8080
+
+### Interface web (Adminer)
+
+`make ui` → http://localhost:8081. Sur l'écran de connexion :
+
+| Champ | Valeur |
+|---|---|
+| Système | **PostgreSQL** |
+| Serveur | `db` |
+| Utilisateur | `careaccess` |
+| Mot de passe | `careaccess` |
+| Base de données | `careaccess` |
+
+Le serveur est `db` (nom du service Docker), pas `localhost` : Adminer tourne dans le même réseau que la base.
+`make down` arrête aussi Adminer.
 
 ## Le schéma
 
