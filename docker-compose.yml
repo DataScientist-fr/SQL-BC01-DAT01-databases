@@ -1,14 +1,17 @@
-name: careaccess
+name: sqlbc01
 
 services:
   db:
     image: postgres:16-alpine
-    container_name: careaccess-db
+    container_name: sqlbc01-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: careaccess
-      POSTGRES_USER: careaccess
-      POSTGRES_PASSWORD: careaccess
+      # admin est le superuser du cluster : il accède à TOUTES les bases
+      # sans le moindre GRANT. Les utilisateurs par base sont créés par
+      # init/10-databases.sh.
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: postgres
       # Locale C délibérée, pour DEUX raisons :
       #  1. l'image alpine (musl libc) ne fournit pas fr_FR.UTF-8 ;
       #     initdb échouerait au premier démarrage ;
@@ -22,11 +25,12 @@ services:
       - "5433:5432"
     volumes:
       # Exécuté au TOUT PREMIER démarrage uniquement (volume vide).
-      # Même fichier que `make load`, qui lui rejoue à la demande.
-      - ./data/careaccess.sql:/docker-entrypoint-initdb.d/careaccess.sql:ro
+      - ./init:/docker-entrypoint-initdb.d:ro
+      # Les fichiers SQL des bases, lus par le script d'init ET par `make load`.
+      - ./sql:/sql:ro
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U careaccess -d careaccess"]
+      test: ["CMD-SHELL", "pg_isready -U admin -d postgres"]
       interval: 3s
       timeout: 3s
       retries: 15
@@ -36,7 +40,7 @@ services:
   # Démarrage : docker compose --profile ui up -d
   adminer:
     image: adminer:latest
-    container_name: careaccess-adminer
+    container_name: sqlbc01-adminer
     restart: unless-stopped
     profiles: ["ui"]
     ports:
