@@ -1,0 +1,52 @@
+name: careaccess
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: careaccess-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: careaccess
+      POSTGRES_USER: careaccess
+      POSTGRES_PASSWORD: careaccess
+      # Locale C délibérée, pour DEUX raisons :
+      #  1. l'image alpine (musl libc) ne fournit pas fr_FR.UTF-8 ;
+      #     initdb échouerait au premier démarrage ;
+      #  2. SQLite trie en BINARY (octet par octet) par défaut. La locale C
+      #     reproduit ce comportement -> les tris sont identiques à ceux de
+      #     la plateforme. Une locale fr_FR introduirait un écart de plus.
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      # 5433 côté hôte pour ne pas entrer en conflit avec un PostgreSQL
+      # local (Django) qui écouterait déjà sur 5432.
+      - "5433:5432"
+    volumes:
+      # Exécuté au TOUT PREMIER démarrage uniquement (volume vide).
+      # Même fichier que `make load`, qui lui rejoue à la demande.
+      - ./data/careaccess.sql:/docker-entrypoint-initdb.d/careaccess.sql:ro
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U careaccess -d careaccess"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+      start_period: 5s
+
+  # Interface web de consultation — optionnelle.
+  # Démarrage : docker compose --profile ui up -d
+  adminer:
+    image: adminer:latest
+    container_name: careaccess-adminer
+    restart: unless-stopped
+    profiles: ["ui"]
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+      ADMINER_DESIGN: dracula
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
