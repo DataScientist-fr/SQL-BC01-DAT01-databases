@@ -16,8 +16,9 @@ make psql DB=fintrust
 |---|---|---|
 | [`careaccess`](sql/careaccess/) | 6 patients, 3 praticiens, 7 rendez-vous, 14 événements | 1.1 → 2.3, 3.4, 6.1 → 6.3 |
 | [`fintrust`](sql/fintrust/) | 3 comptes, 4 commerçants, 10 transactions | 2.1, 2.3, 3.1 → 3.3 |
+| [`shopflow`](sql/shopflow/) | 5 catégories, 7 clients, 8 produits, 8 commandes, 15 lignes | 3.1 → 3.4, 4.1 → 5.3 |
 
-**ShopFlow** (chapitres 4.x et 5.x) reste à porter.
+Les trois jeux de données du cours sont là.
 
 ## Se connecter
 
@@ -78,8 +79,8 @@ laisser une base à moitié remplie. Dans ce cas : `make load`.
 Le nom du dossier sous `sql/` **est** le nom de la base, du rôle et du mot de passe.
 
 ```bash
-mkdir sql/shopflow
-$EDITOR sql/shopflow/shopflow.sql   # DROP … CASCADE en tête, pour rester rejouable
+mkdir sql/nouvelle_base
+$EDITOR sql/nouvelle_base/nouvelle_base.sql   # DROP … CASCADE en tête, pour rester rejouable
 make reset
 ```
 
@@ -119,7 +120,8 @@ minuscules, accents après le `z`.
 │   └── 10-databases.sh   # rôles + bases + chargement, au premier démarrage
 └── sql/
     ├── careaccess/careaccess.sql
-    └── fintrust/fintrust.sql
+    ├── fintrust/fintrust.sql
+    └── shopflow/shopflow.sql
 ```
 
 Chaque `.sql` est monté dans le conteneur (`./sql:/sql:ro`) et sert **deux fois** : au premier
