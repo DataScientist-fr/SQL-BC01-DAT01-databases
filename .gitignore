@@ -1,0 +1,15 @@
+# Surcharges locales de compose (ports, volumes, mots de passe)
+docker-compose.override.yml
+.env
+
+# Dumps et exports produits localement
+*.dump
+*.sql.gz
+
+# Éditeurs / OS
+.vscode/
+.idea/
+.DS_Store
+
+# MCP
+.mcp.json
